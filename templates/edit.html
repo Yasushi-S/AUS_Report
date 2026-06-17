@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>データ編集 - AUS報告書システム</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90d9;
+            --secondary-color: #64b5f6;
+            --background-dark: #0d1b2a;
+            --surface-dark: #1b2838;
+            --error-color: #ef5350;
+            --text-primary: #e8f1f8;
+        }
+
+        body {
+            font-family: 'メイリオ', 'Meiryo', sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .edit-form {
+            background-color: var(--surface-dark);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            font-weight: 500;
+            margin: 10px 0 8px;
+            display: block;
+            color: var(--primary-color);
+            transition: color 0.3s ease;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background-color: #2c2c2c;
+            color: var(--text-primary);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(74, 144, 217, 0.3);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+
+        .btn-secondary {
+            background-color: #666;
+            color: #ffffff;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .flash-message {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            text-align: center;
+            animation: slideIn 0.5s ease-out, fadeOut 8s forwards;
+            font-weight: 500;
+        }
+
+        .success {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .error {
+            background-color: var(--error-color);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .edit-form {
+                padding: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+
+        input:invalid {
+            border-color: var(--error-color);
+        }
+
+        .validation-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        input:invalid + .validation-message {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header style="text-align:center; padding: 15px 0 10px; border-bottom: 1px solid #2a4060; margin-bottom: 20px;">
+        <h1 style="color: #4a90d9; font-size: 1.4rem; margin: 0;">AUS報告書管理システム</h1>
+        <p style="color: #7a9ab0; font-size: 0.85rem; margin: 4px 0 0;">院内専用システム &mdash; 無断アクセス禁止</p>
+    </header>
+    <div class="container">
+        <div class="edit-form">
+            <h1>データ編集</h1>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('submit_edit', record_id=record_id) }}" method="post">
+                <div class="form-group">
+                    <label for="通算No">通算No:</label>
+                    <input type="text" name="通算No" id="通算No" value="{{ patient_data['通算No'] }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="Age">年齢:</label>
+                    <input type="number" name="Age" id="Age" value="{{ patient_data['Age'] }}"
+                           required min="0" max="100">
+                    <div class="validation-message">年齢は0-100の範囲で入力してください</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Address">管轄:</label>
+                    <input type="text" id="Address" name="Address" list="kankatsu_options"
+                           value="{{ patient_data['Address'] }}" required>
+                    <datalist id="kankatsu_options">
+                        {% for option in kankatsu_options %}
+                            <option value="{{ option }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+
+                <div class="form-group">
+                    <label for="Gestational_Age">週数:</label>
+                    <select name="Gestational Age" id="Gestational_Age" required>
+                        {% for week in weeks_range %}
+                            <option value="{{ week }}"
+                                    {% if week == patient_data['Gestational Age']|int %}selected{% endif %}>
+                                {{ week }}週
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="Date">日付:</label>
+                    <input type="date" name="Date" id="Date" value="{{ patient_data['Date'] }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ID">ID (5桁):</label>
+                    <input type="text" name="ID" id="ID" value="{{ patient_data['ID'] }}"
+                           maxlength="5" minlength="5" pattern="[0-9]{5}" required
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <div class="validation-message">5桁の数字を入力してください</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="特記事項">特記事項:</label>
+                    <input type="text" name="特記事項" id="特記事項" value="{{ patient_data['特記事項'] }}">
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">更新</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">キャンセル</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const flashMessages = document.querySelectorAll('.flash-message');
+                flashMessages.forEach(function(message) {
+                    message.style.display = 'none';
+                });
+            }, 8000);
+        });
+
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    </script>
+</body>
+</html>

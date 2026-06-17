@@ -1,0 +1,13 @@
+venv/
+__pycache__/
+*.pyc
+.env
+*.db
+instance/
+.DS_Store
+changes.log
+*.log
+logs/
+month_data/
+AUS報告書/
+*.xlsx
