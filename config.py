@@ -9,5 +9,5 @@ class Config:
     OUTPUT_DIR = 'month_data'
     PPTX_OUTPUT_DIR = 'AUS報告書'
     HOST = '0.0.0.0'
-    PORT = 50013
+    PORT = 50003
     DEBUG = False
